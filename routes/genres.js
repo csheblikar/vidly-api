@@ -4,6 +4,7 @@ const admin = require('../middleware/admin');
 const express = require('express');
 const router = express.Router();
 const { Genre, validate } = require('../models/genre');
+const HttpError = require('../lib/http-error');
 
 router.get('/', async (req, res) => {
     // throw new Error('Could not get the genres');
@@ -13,7 +14,9 @@ router.get('/', async (req, res) => {
 
 router.post('/', auth, async (req, res) => {
     const { error } = validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error) {
+        throw new HttpError(400, error.details[0].message);
+    }
 
     let genre = new Genre({ name: req.body.name });
     genre = await genre.save();
@@ -22,7 +25,9 @@ router.post('/', auth, async (req, res) => {
 
 router.put('/:id', [auth, validateObjectId], async (req, res) => {
     const { error } = validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error) {
+        throw new HttpError(400, error.details[0].message);
+    }
 
     const genre = await Genre.findByIdAndUpdate(
         req.params.id,
@@ -33,10 +38,9 @@ router.put('/:id', [auth, validateObjectId], async (req, res) => {
     );
 
     //const genre = genres.find(c => c.id === parseInt(req.params.id));
-    if (!genre)
-        return res
-            .status(404)
-            .send('The genre with the given ID was not found.');
+    if (!genre) {
+        throw new HttpError(404, 'The genre with the given ID was not found.');
+    }
 
     res.send(genre);
 });
@@ -45,10 +49,9 @@ router.delete('/:id', [auth, admin, validateObjectId], async (req, res) => {
     const genre = await Genre.findByIdAndRemove(req.params.id);
 
     //const genre = genres.find(c => c.id === parseInt(req.params.id));
-    if (!genre)
-        return res
-            .status(404)
-            .send('The genre with the given ID was not found.');
+    if (!genre) {
+        throw new HttpError(404, 'The genre with the given ID was not found.');
+    }
 
     //const index = genres.indexOf(genre);
     //genres.splice(index, 1);
@@ -60,10 +63,10 @@ router.get('/:id', validateObjectId, async (req, res) => {
     const genre = await Genre.findById(req.params.id);
 
     //const genre = genres.find(c => c.id === parseInt(req.params.id));
-    if (!genre)
-        return res
-            .status(404)
-            .send('The genre with the given ID was not found.');
+    if (!genre) {
+        throw new HttpError(404, 'The genre with the given ID was not found.');
+    }
+
     res.send(genre);
 });
 

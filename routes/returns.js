@@ -4,15 +4,18 @@ const { Movie } = require('../models/movie');
 const auth = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const express = require('express');
+const HttpError = require('../lib/http-error');
 const router = express.Router();
 
 router.post('/', [auth, validate(validateReturn)], async (req, res) => {
     const rental = await Rental.lookup(req.body.customerId, req.body.movieId);
 
-    if (!rental) return res.status(404).send('Rental not found');
-
-    if (rental.dateReturned)
-        return res.status(400).send('Rental already processed.');
+    if (!rental) {
+        throw new HttpError(404, 'Rental not found');
+    }
+    if (rental.dateReturned) {
+        throw new HttpError(400, 'Rental already processed.');
+    }
 
     rental.return();
     await rental.save();

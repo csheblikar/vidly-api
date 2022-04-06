@@ -1,5 +1,6 @@
 const { Customer, validate } = require('../models/customer');
 const express = require('express');
+const HttpError = require('../lib/http-error');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
@@ -9,7 +10,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     const { error } = validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error) throw new HttpError(400, error.details[0].message);
 
     let customer = new Customer({
         name: req.body.name,
@@ -22,7 +23,7 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     const { error } = validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error) throw new HttpError(400, error.details[0].message);
 
     const customer = await Customer.findByIdAndUpdate(
         req.params.id,
@@ -35,30 +36,38 @@ router.put('/:id', async (req, res) => {
             new: true
         }
     );
-    if (!customer)
-        return res
-            .status(404)
-            .send('The customer with the given ID was not found.');
+    if (!customer) {
+        throw new HttpError(
+            404,
+            'The customer with the given ID was not found.'
+        );
+    }
 
     res.send(customer);
 });
 
 router.delete('/:id', async (req, res) => {
     const customer = await Customer.findByIdAndRemove(req.params.id);
-    if (!customer)
-        return res
-            .status(404)
-            .send('The customer with the given ID was not found.');
+    if (!customer) {
+        throw new HttpError(
+            404,
+            'The customer with the given ID was not found.'
+        );
+    }
+
     res.send(customer);
 });
 
 router.get('/:id', async (req, res) => {
     const customer = await Customer.findById(req.params.id);
 
-    if (!customer)
-        return res
-            .status(404)
-            .send('The customer with the given ID was not found.');
+    if (!customer) {
+        throw new HttpError(
+            404,
+            'The customer with the given ID was not found.'
+        );
+    }
+
     res.send(customer);
 });
 
