@@ -10,7 +10,9 @@ describe('auth middleware', () => {
         };
         const token = new User(user).generateAuthToken();
         const req = {
-            header: jest.fn().mockReturnValue(token)
+            headers: {
+                authorization: `Bearer ${token}`
+            }
         };
         const res = {};
         const next = jest.fn();
