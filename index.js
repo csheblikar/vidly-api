@@ -13,6 +13,7 @@ const mongoose = require("mongoose");
   app.use("/api/genres", require("./routes/genres"));
   app.use("/api/customers", require("./routes/customers"));
   app.use("/api/movies", require("./routes/movies"));
+  app.use("/api/rentals", require("./routes/rentals"));
 
   app.get("/", (req, res) => {
     res.send("Vidly");
