@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 
 (async () => {
-  await mongoose.connect("mongodb://localhost:27017/Vidly");
+  await mongoose.connect("mongodb://localhost:27017/vidly");
   console.log("Connected to MongoDB...");
 
   const app = express();

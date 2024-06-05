@@ -19,7 +19,9 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   const customer = await Customer.findOne({ _id: req.params.id });
   if (!customer) {
-    res.status(404).send({ error: "Customer with the given ID not found" });
+    return res
+      .status(404)
+      .send({ error: "Customer with the given ID not found" });
   }
 
   res.send({ data: customer });
@@ -28,7 +30,7 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   const { error, value } = schema.validate(req.body, { stripUnknown: true });
   if (error) {
-    res.status(400).send({ error: error.details[0].error });
+    return res.status(400).send({ error: error.details[0].error });
   }
 
   const customer = new Customer({
@@ -54,7 +56,9 @@ router.put("/:id", async (req, res) => {
   );
 
   if (!customer) {
-    res.status(404).send({ error: "Customer with the given ID not found" });
+    return res
+      .status(404)
+      .send({ error: "Customer with the given ID not found" });
   }
 
   res.send({ data: customer });
@@ -64,7 +68,9 @@ router.delete("/:id", async (req, res) => {
   const customer = await Customer.findOneAndDelete({ _id: req.params.id });
 
   if (!customer) {
-    res.status(404).send({ error: "Customer with the given ID not found" });
+    return res
+      .status(404)
+      .send({ error: "Customer with the given ID not found" });
   }
 
   res.send({ data: customer });

@@ -7,7 +7,7 @@ const router = express.Router();
 
 const schema = Joi.object({
   title: Joi.string().min(5).max(50).required(),
-  genreId: Joi.string().required(),
+  genre: Joi.string().required(),
   numberInStock: Joi.number().min(0).required(),
   dailyRentalRate: Joi.number().min(0).required(),
 });
@@ -19,9 +19,9 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  const movie = await Movie.findOne({ _id: req.params.id });
+  const movie = await Movie.findOne({ _id: req.params.id }).populate("genre");
   if (!movie) {
-    res.status(404).send({ error: "Movie not found" });
+    return res.status(404).send({ error: "Movie not found" });
   }
 
   res.send({ data: movie });
@@ -30,24 +30,17 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   const { error, value } = schema.validate(req.body);
   if (error) {
-    res.status(400).send({ error: error.details[0].message });
+    return res.status(400).send({ error: error.details[0].message });
   }
 
-  const genre = await Genre.findOne({ _id: value.genreId });
+  const genre = await Genre.findOne({ _id: value.genre });
   if (!genre) {
-    res.status(404).send({ error: "Genre not found" });
+    return res.status(404).send({ error: "Genre not found" });
   }
 
-  let movie = new Movie({
-    title: value.title,
-    genre: {
-      _id: genre._id,
-      name: genre.name,
-    },
-    numberInStock: value.numberInStock,
-    dailyRentalRate: value.dailyRentalRate,
-  });
-  movie = await movie.save();
+  const movie = new Movie({ ...value, genre: genre._id });
+  await movie.save();
+  await movie.populate("genre");
 
   res.send({ data: movie });
 });
@@ -55,30 +48,22 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const { error, value } = schema.validate(req.body);
   if (error) {
-    res.status(400).send({ error: error.details[0].message });
+    return res.status(400).send({ error: error.details[0].message });
   }
 
-  const genre = await Genre.findOne({ _id: value.genreId });
+  const genre = await Genre.findOne({ _id: value.genre });
   if (!genre) {
-    res.status(404).send({ error: "Genre not found" });
+    return res.status(404).send({ error: "Genre not found" });
   }
 
   const movie = await Movie.findOneAndUpdate(
     { _id: req.params.id },
-    {
-      title: value.title,
-      genre: {
-        _id: genre._id,
-        name: genre.name,
-      },
-      numberInStock: value.numberInStock,
-      dailyRentalRate: value.dailyRentalRate,
-    },
+    { ...value, genre: genre._id },
     { new: true },
-  );
+  ).populate("genre");
 
   if (!movie) {
-    res.status(404).send({ error: "Movie not found" });
+    return res.status(404).send({ error: "Movie not found" });
   }
 
   res.send({ data: movie });
@@ -88,7 +73,7 @@ router.delete("/:id", async (req, res) => {
   const movie = await Movie.findOneAndDelete({ _id: req.params.id });
 
   if (!movie) {
-    res.status(404).send({ error: "Movie not found" });
+    return res.status(404).send({ error: "Movie not found" });
   }
 
   res.send({ data: movie });

@@ -7,7 +7,7 @@ const genreSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-const Genre = mongoose.model("Genre", genreSchema);
+const Genre = mongoose.model("genre", genreSchema);
 
 exports.Genre = Genre;
 exports.genreSchema = genreSchema;

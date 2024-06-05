@@ -1,6 +1,7 @@
 const Joi = require("joi");
 const express = require("express");
-const Genre = require("../models/genre");
+const { Genre } = require("../models/genre");
+const Movie = require("../models/movie");
 
 const router = express.Router();
 
@@ -57,11 +58,18 @@ router.put("/:id", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-  const genre = await Genre.findOneAndDelete({ _id: req.params.id });
-
+  const genre = await Genre.findOne({ _id: req.params.id });
   if (!genre) {
-    return res.status(404).send({ error: "Genre with the given ID not found" });
+    return res.status(404).send({ error: "Genre not found" });
   }
+
+  const hasMovies = await Movie.exists({ genre: genre._id });
+  if (hasMovies) {
+    return res.status(400).send({ error: "Unable to delete genre" });
+  }
+
+  await genre.deleteOne();
+
   res.send({ data: genre });
 });
 
