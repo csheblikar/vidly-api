@@ -7,8 +7,12 @@ const Movie = require("../models/movie");
 const router = express.Router();
 
 const schema = Joi.object({
-  customer: Joi.string().required(),
-  movie: Joi.string().required(),
+  customer: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required(),
+  movie: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required(),
 });
 
 router.get("/", async (req, res) => {

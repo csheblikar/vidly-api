@@ -7,7 +7,9 @@ const router = express.Router();
 
 const schema = Joi.object({
   title: Joi.string().min(5).max(50).required(),
-  genre: Joi.string().required(),
+  genre: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required(),
   numberInStock: Joi.number().min(0).required(),
   dailyRentalRate: Joi.number().min(0).required(),
 });
