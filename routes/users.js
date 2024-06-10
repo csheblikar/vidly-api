@@ -1,3 +1,4 @@
+const auth = require("../middleware/auth");
 const bcrypt = require("bcrypt");
 const config = require("config");
 const express = require("express");
@@ -11,6 +12,12 @@ const schema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().required().email(),
   password: Joi.string().min(8).max(50).required(),
+});
+
+router.get("/me", auth, async (req, res) => {
+  const user = await User.findOne({ _id: req.user._id });
+
+  res.send({ data: user });
 });
 
 router.post("/", async (req, res) => {
