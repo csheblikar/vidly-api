@@ -14,7 +14,7 @@ const schema = Joi.object({
 });
 
 router.get("/me", auth, async (req, res) => {
-  const user = await User.findOne({ _id: req.user._id });
+  const user = await User.findOne({ _id: req.user.sub });
 
   res.send({ data: user });
 });
