@@ -15,6 +15,7 @@ const mongoose = require("mongoose");
   app.use("/api/movies", require("./routes/movies"));
   app.use("/api/rentals", require("./routes/rentals"));
   app.use("/api/users", require("./routes/users"));
+  app.use("/api/logins", require("./routes/logins"));
 
   app.get("/", (req, res) => {
     res.send("Vidly");
