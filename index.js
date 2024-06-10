@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
+require("dotenv").config();
+
 (async () => {
   await mongoose.connect("mongodb://localhost:27017/vidly");
   console.log("Connected to MongoDB...");
