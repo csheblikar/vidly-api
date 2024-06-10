@@ -12,6 +12,7 @@ const schema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().required().email(),
   password: Joi.string().min(8).max(50).required(),
+  isAdmin: Joi.boolean().required(),
 });
 
 router.get("/me", auth, async (req, res) => {
@@ -32,8 +33,7 @@ router.post("/", async (req, res) => {
   }
 
   user = new User({ ...value });
-  const saltRounds = 10;
-  user.password = await bcrypt.hash(value.password, saltRounds);
+  user.password = await bcrypt.hash(value.password, 12);
 
   await user.save();
 
