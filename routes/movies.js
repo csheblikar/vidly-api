@@ -29,7 +29,7 @@ router.get("/:id", async (req, res) => {
   res.send({ data: movie });
 });
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const { error, value } = schema.validate(req.body);
   if (error) {
     return res.status(400).send({ error: error.details[0].message });
@@ -47,7 +47,7 @@ router.post("/", async (req, res) => {
   res.send({ data: movie });
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
   const { error, value } = schema.validate(req.body);
   if (error) {
     return res.status(400).send({ error: error.details[0].message });
@@ -71,7 +71,7 @@ router.put("/:id", async (req, res) => {
   res.send({ data: movie });
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   const movie = await Movie.findOneAndDelete({ _id: req.params.id });
 
   if (!movie) {
