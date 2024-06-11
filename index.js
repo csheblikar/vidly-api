@@ -1,4 +1,5 @@
 const express = require("express");
+require("express-async-errors");
 const { expressjwt: expressJwt } = require("express-jwt");
 const mongoose = require("mongoose");
 
@@ -39,6 +40,9 @@ require("dotenv").config();
   app.get("/", (req, res) => {
     res.send("Vidly");
   });
+
+  // global error handler middleware
+  app.use(require("./middleware/error"));
 
   const port = process.env.PORT || 4000;
   app.listen(port, () => console.log(`Listening on port ${port}...`));
