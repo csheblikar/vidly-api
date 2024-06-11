@@ -13,7 +13,7 @@ const schema = Joi.object({
   isAdmin: Joi.boolean().required(),
 });
 
-router.get("/me", auth, async (req, res) => {
+router.get("/me", async (req, res) => {
   const user = await User.findOne({ _id: req.user.sub });
 
   res.send({ data: user });

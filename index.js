@@ -1,4 +1,5 @@
 const express = require("express");
+const { expressjwt: expressJwt } = require("express-jwt");
 const mongoose = require("mongoose");
 
 require("dotenv").config();
@@ -11,6 +12,22 @@ require("dotenv").config();
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
+
+  app.use(
+    expressJwt({
+      secret: process.env.JWT_SECRET,
+      algorithms: ["HS256"],
+      credentialsRequired: true,
+      requestProperty: "user", // by default it's "auth"
+    }).unless({
+      path: [
+        "/api/logins",
+        { url: /^\/api\/movies(\/.*)?$/, method: "GET" },
+        { url: /^\/api\/genres(\/.*)?$/, method: "GET" },
+        { url: "/api/users", method: "POST" },
+      ],
+    }),
+  );
 
   app.use("/api/genres", require("./routes/genres"));
   app.use("/api/customers", require("./routes/customers"));

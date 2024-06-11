@@ -22,7 +22,7 @@ router.get("/", async (req, res) => {
   res.send({ data: rentals });
 });
 
-router.post("/", auth, async (req, res) => {
+router.post("/", async (req, res) => {
   const { error, value } = schema.validate(req.body, { stripUnknown: true });
   if (error) {
     return res.status(400).send({ error: error.details[0].message });

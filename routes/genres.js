@@ -26,7 +26,7 @@ router.get("/:id", async (req, res) => {
   res.send({ data: genre });
 });
 
-router.post("/", auth, async (req, res) => {
+router.post("/", async (req, res) => {
   const { error, value } = schema.validate(req.body, { stripUnknown: true });
   if (error) {
     return res.status(400).send({ error: error.details[0].message });
@@ -38,7 +38,7 @@ router.post("/", auth, async (req, res) => {
   res.send({ data: genre });
 });
 
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", async (req, res) => {
   const { error, value } = schema.validate(req.body, { stripUnknown: true });
   if (error) {
     return res.status(400).send({ error: error.details[0].message });
@@ -59,7 +59,7 @@ router.put("/:id", auth, async (req, res) => {
   res.send({ data: genre });
 });
 
-router.delete("/:id", auth, admin, async (req, res) => {
+router.delete("/:id", admin, async (req, res) => {
   const genre = await Genre.findOne({ _id: req.params.id });
   if (!genre) {
     return res.status(404).send({ error: "Genre not found" });

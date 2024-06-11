@@ -28,7 +28,7 @@ router.get("/:id", async (req, res) => {
   res.send({ data: customer });
 });
 
-router.post("/", auth, async (req, res) => {
+router.post("/", async (req, res) => {
   const { error, value } = schema.validate(req.body, { stripUnknown: true });
   if (error) {
     return res.status(400).send({ error: error.details[0].error });
@@ -44,7 +44,7 @@ router.post("/", auth, async (req, res) => {
   res.send({ data: customer });
 });
 
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", async (req, res) => {
   const { error, value } = schema.validate(req.body, { stripUnknown: true });
   if (error) {
     return res.status(400).send({ error: error.details[0].message });
@@ -65,7 +65,7 @@ router.put("/:id", auth, async (req, res) => {
   res.send({ data: customer });
 });
 
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", async (req, res) => {
   const customer = await Customer.findOneAndDelete({ _id: req.params.id });
 
   if (!customer) {
