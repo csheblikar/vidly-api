@@ -1,5 +1,6 @@
 const auth = require("../middleware/auth");
 const express = require("express");
+const HttpError = require("../utils/http-error");
 const Joi = require("joi");
 const Customer = require("../models/customer");
 
@@ -20,9 +21,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   const customer = await Customer.findOne({ _id: req.params.id });
   if (!customer) {
-    return res
-      .status(404)
-      .send({ error: "Customer with the given ID not found" });
+    throw new HttpError(404, "Customer with the given ID not found");
   }
 
   res.send({ data: customer });
@@ -31,7 +30,7 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   const { error, value } = schema.validate(req.body, { stripUnknown: true });
   if (error) {
-    return res.status(400).send({ error: error.details[0].error });
+    throw new HttpError(400, error.details[0].message);
   }
 
   const customer = new Customer({
@@ -47,7 +46,7 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const { error, value } = schema.validate(req.body, { stripUnknown: true });
   if (error) {
-    return res.status(400).send({ error: error.details[0].message });
+    throw new HttpError(400, error.details[0].message);
   }
 
   const customer = await Customer.findOneAndUpdate(
@@ -57,9 +56,7 @@ router.put("/:id", async (req, res) => {
   );
 
   if (!customer) {
-    return res
-      .status(404)
-      .send({ error: "Customer with the given ID not found" });
+    throw new HttpError(404, "Customer with the given ID not found");
   }
 
   res.send({ data: customer });
@@ -69,9 +66,7 @@ router.delete("/:id", async (req, res) => {
   const customer = await Customer.findOneAndDelete({ _id: req.params.id });
 
   if (!customer) {
-    return res
-      .status(404)
-      .send({ error: "Customer with the given ID not found" });
+    throw new HttpError(404, "Customer with the given ID not found");
   }
 
   res.send({ data: customer });

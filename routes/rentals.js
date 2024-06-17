@@ -1,5 +1,6 @@
 const auth = require("../middleware/auth");
 const express = require("express");
+const HttpError = require("../utils/http-error");
 const Joi = require("joi");
 const Rental = require("../models/rental");
 const Customer = require("../models/customer");
@@ -25,7 +26,7 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   const { error, value } = schema.validate(req.body, { stripUnknown: true });
   if (error) {
-    return res.status(400).send({ error: error.details[0].message });
+    throw new HttpError(400, error.details[0].message);
   }
   const session = await Rental.startSession();
 
@@ -34,16 +35,16 @@ router.post("/", async (req, res) => {
       session,
     );
     if (!customer) {
-      return res.status(400).send({ error: "Invalid customer" });
+      throw new HttpError(400, "Invalid customer");
     }
 
     const movie = await Movie.findOne({ _id: value.movie }).session(session);
     if (!movie) {
-      return res.status(400).send({ error: "Invalid movie" });
+      throw new HttpError(400, "Invalid movie");
     }
 
     if (movie.numberInStock === 0) {
-      return res.status(400).send({ error: "Movie not in stock" });
+      throw new HttpError(400, "Movie not in stock");
     }
 
     movie.numberInStock--;

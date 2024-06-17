@@ -1,6 +1,7 @@
 const auth = require("../middleware/auth");
 const bcrypt = require("bcrypt");
 const express = require("express");
+const HttpError = require("../utils/http-error");
 const Joi = require("joi");
 const User = require("../models/user");
 
@@ -22,12 +23,12 @@ router.get("/me", async (req, res) => {
 router.post("/", async (req, res) => {
   const { error, value } = schema.validate(req.body, { stripUnknown: true });
   if (error) {
-    return res.status(400).send({ error: error.details[0].message });
+    throw new HttpError(400, error.details[0].message);
   }
 
   let user = await User.findOne({ email: value.email });
   if (user) {
-    return res.status(400).send({ error: "User already registered" });
+    throw new HttpError(400, "User already registered");
   }
 
   user = new User({ ...value });

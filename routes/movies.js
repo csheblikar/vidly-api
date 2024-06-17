@@ -1,5 +1,6 @@
 const auth = require("../middleware/auth");
 const express = require("express");
+const HttpError = require("../utils/http-error");
 const Joi = require("joi");
 const Movie = require("../models/movie");
 const { Genre } = require("../models/genre");
@@ -24,7 +25,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   const movie = await Movie.findOne({ _id: req.params.id }).populate("genre");
   if (!movie) {
-    return res.status(404).send({ error: "Movie not found" });
+    throw new HttpError(404, "Movie not found");
   }
 
   res.send({ data: movie });
@@ -33,12 +34,12 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   const { error, value } = schema.validate(req.body);
   if (error) {
-    return res.status(400).send({ error: error.details[0].message });
+    throw new HttpError(400, error.details[0].message);
   }
 
   const genre = await Genre.findOne({ _id: value.genre });
   if (!genre) {
-    return res.status(404).send({ error: "Genre not found" });
+    throw new HttpError(404, "Genre not found");
   }
 
   const movie = new Movie({ ...value, genre: genre._id });
@@ -51,12 +52,12 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const { error, value } = schema.validate(req.body);
   if (error) {
-    return res.status(400).send({ error: error.details[0].message });
+    throw new HttpError(400, error.details[0].message);
   }
 
   const genre = await Genre.findOne({ _id: value.genre });
   if (!genre) {
-    return res.status(404).send({ error: "Genre not found" });
+    throw new HttpError(404, "Genre not found");
   }
 
   const movie = await Movie.findOneAndUpdate(
@@ -66,7 +67,7 @@ router.put("/:id", async (req, res) => {
   ).populate("genre");
 
   if (!movie) {
-    return res.status(404).send({ error: "Movie not found" });
+    throw new HttpError(404, "Movie not found");
   }
 
   res.send({ data: movie });
@@ -76,7 +77,7 @@ router.delete("/:id", async (req, res) => {
   const movie = await Movie.findOneAndDelete({ _id: req.params.id });
 
   if (!movie) {
-    return res.status(404).send({ error: "Movie not found" });
+    throw new HttpError(404, "Movie not found");
   }
 
   res.send({ data: movie });

@@ -1,5 +1,6 @@
 const admin = require("../middleware/admin");
 const auth = require("../middleware/auth");
+const HttpError = require("../utils/http-error");
 const Joi = require("joi");
 const express = require("express");
 const { Genre } = require("../models/genre");
@@ -20,7 +21,7 @@ router.get("/:id", async (req, res) => {
   const genre = await Genre.findById(req.params.id);
 
   if (!genre) {
-    return res.status(404).send({ error: "Genre with the given ID not found" });
+    throw new HttpError(404, "Genre with the given ID not found");
   }
 
   res.send({ data: genre });
@@ -29,7 +30,7 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   const { error, value } = schema.validate(req.body, { stripUnknown: true });
   if (error) {
-    return res.status(400).send({ error: error.details[0].message });
+    throw new HttpError(400, error.details[0].message);
   }
 
   const genre = new Genre({ name: value.name });
@@ -41,7 +42,7 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const { error, value } = schema.validate(req.body, { stripUnknown: true });
   if (error) {
-    return res.status(400).send({ error: error.details[0].message });
+    throw new HttpError(400, error.details[0].message);
   }
 
   const genre = await Genre.findByIdAndUpdate(
@@ -53,7 +54,7 @@ router.put("/:id", async (req, res) => {
   );
 
   if (!genre) {
-    return res.status(404).send({ error: "Genre with the given ID not found" });
+    throw new HttpError(404, "Genre with the given ID not found");
   }
 
   res.send({ data: genre });
@@ -62,12 +63,12 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", admin, async (req, res) => {
   const genre = await Genre.findOne({ _id: req.params.id });
   if (!genre) {
-    return res.status(404).send({ error: "Genre not found" });
+    throw new HttpError(404, "Genre not found");
   }
 
   const hasMovies = await Movie.exists({ genre: genre._id });
   if (hasMovies) {
-    return res.status(400).send({ error: "Unable to delete genre" });
+    throw new HttpError(400, "Unable to delete genre");
   }
 
   await genre.deleteOne();
