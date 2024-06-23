@@ -24,6 +24,6 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "DOTENV_CONFIG_PATH=.env.test.local jest --watchAll --verbose"
+    "test": "DOTENV_CONFIG_PATH=.env.test.local jest --watchAll --verbose --coverage"
   }
 }
