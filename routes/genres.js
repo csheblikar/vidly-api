@@ -39,7 +39,7 @@ router.post("/", async (req, res) => {
   res.send({ data: genre });
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", validateObjectId, async (req, res) => {
   const { error, value } = schema.validate(req.body, { stripUnknown: true });
   if (error) {
     throw new HttpError(400, error.details[0].message);
@@ -60,7 +60,7 @@ router.put("/:id", async (req, res) => {
   res.send({ data: genre });
 });
 
-router.delete("/:id", admin, async (req, res) => {
+router.delete("/:id", validateObjectId, admin, async (req, res) => {
   const genre = await Genre.findOne({ _id: req.params.id });
   if (!genre) {
     throw new HttpError(404, "Genre not found");
