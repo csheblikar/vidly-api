@@ -62,12 +62,7 @@ describe("/api/genres", () => {
       expect(res.status).toBe(401);
     });
 
-    // don't have to check this because we're using express-jwt for auth
-    // it("should return 401 if token is invalid", async () => {
-    //   token = "1234";
-    //   const res = await exec();
-    //   expect(res.status).toBe(401);
-    // });
+    // don't have to check invalid token because we're using express-jwt for auth
 
     it("should return 400 if genre is less than 5 characters", async () => {
       name = "1234";
