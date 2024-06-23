@@ -1,10 +1,10 @@
 const admin = require("../middleware/admin");
-const auth = require("../middleware/auth");
 const HttpError = require("../utils/http-error");
 const Joi = require("joi");
 const express = require("express");
 const { Genre } = require("../models/genre");
 const Movie = require("../models/movie");
+const validateObjectId = require("../middleware/validateObjectId");
 
 const router = express.Router();
 
@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
   res.send({ data: genres });
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", validateObjectId, async (req, res) => {
   const genre = await Genre.findById(req.params.id);
 
   if (!genre) {
