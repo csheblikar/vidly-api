@@ -4,6 +4,7 @@ const HttpError = require("../utils/http-error");
 const Rental = require("../models/rental");
 const Movie = require("../models/movie");
 const moment = require("moment");
+const validate = require("../middleware/validate");
 
 const router = express.Router();
 
@@ -16,15 +17,10 @@ const schema = Joi.object({
     .required(),
 });
 
-router.post("/", async (req, res) => {
-  const { error, value } = schema.validate(req.body, { stripUnknown: true });
-  if (error) {
-    throw new HttpError(400, error.details[0].message);
-  }
-
+router.post("/", validate(schema), async (req, res) => {
   const rental = await Rental.findOne({
-    customer: value.customer,
-    movie: value.movie,
+    customer: req.body.customer,
+    movie: req.body.movie,
   });
 
   if (!rental) {
@@ -37,7 +33,7 @@ router.post("/", async (req, res) => {
 
   rental.dateReturned = new Date();
 
-  const movie = await Movie.findOne({ _id: value.movie });
+  const movie = await Movie.findOne({ _id: req.body.movie });
   rental.rentalFee =
     moment().diff(rental.dateOut, "days") * movie.dailyRentalRate;
 
