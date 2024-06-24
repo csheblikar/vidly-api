@@ -1,17 +1,11 @@
 const admin = require("../middleware/admin");
 const express = require("express");
 const HttpError = require("../utils/http-error");
-const Joi = require("joi");
 const Customer = require("../models/customer");
 const validateObjectId = require("../middleware/validateObjectId");
+const { customerSchema } = require("../utils/joi");
 
 const router = express.Router();
-
-const schema = Joi.object({
-  name: Joi.string().min(5).required(),
-  isGold: Joi.boolean().required(),
-  phone: Joi.string().min(10).required(),
-});
 
 router.get("/", async (req, res) => {
   const customers = await Customer.find();
@@ -29,7 +23,9 @@ router.get("/:id", validateObjectId, async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { error, value } = schema.validate(req.body, { stripUnknown: true });
+  const { error, value } = customerSchema.validate(req.body, {
+    stripUnknown: true,
+  });
   if (error) {
     throw new HttpError(400, error.details[0].message);
   }
@@ -45,7 +41,9 @@ router.post("/", async (req, res) => {
 });
 
 router.put("/:id", validateObjectId, async (req, res) => {
-  const { error, value } = schema.validate(req.body, { stripUnknown: true });
+  const { error, value } = customerSchema.validate(req.body, {
+    stripUnknown: true,
+  });
   if (error) {
     throw new HttpError(400, error.details[0].message);
   }

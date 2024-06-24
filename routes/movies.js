@@ -1,20 +1,10 @@
-const auth = require("../middleware/auth");
 const express = require("express");
 const HttpError = require("../utils/http-error");
-const Joi = require("joi");
 const Movie = require("../models/movie");
 const { Genre } = require("../models/genre");
+const { movieSchema } = require("../utils/joi");
 
 const router = express.Router();
-
-const schema = Joi.object({
-  title: Joi.string().min(5).max(50).required(),
-  genre: Joi.string()
-    .regex(/^[0-9a-fA-F]{24}$/)
-    .required(),
-  numberInStock: Joi.number().min(0).required(),
-  dailyRentalRate: Joi.number().min(0).required(),
-});
 
 router.get("/", async (req, res) => {
   const movies = await Movie.find();
@@ -32,7 +22,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { error, value } = schema.validate(req.body);
+  const { error, value } = movieSchema.validate(req.body);
   if (error) {
     throw new HttpError(400, error.details[0].message);
   }
@@ -50,7 +40,7 @@ router.post("/", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
-  const { error, value } = schema.validate(req.body);
+  const { error, value } = movieSchema.validate(req.body);
   if (error) {
     throw new HttpError(400, error.details[0].message);
   }

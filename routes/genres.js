@@ -1,16 +1,12 @@
 const admin = require("../middleware/admin");
 const HttpError = require("../utils/http-error");
-const Joi = require("joi");
 const express = require("express");
 const { Genre } = require("../models/genre");
 const Movie = require("../models/movie");
 const validateObjectId = require("../middleware/validateObjectId");
+const { genreSchema } = require("../utils/joi");
 
 const router = express.Router();
-
-const schema = Joi.object({
-  name: Joi.string().min(5).trim().required(),
-});
 
 router.get("/", async (req, res) => {
   const genres = await Genre.find();
@@ -28,7 +24,9 @@ router.get("/:id", validateObjectId, async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { error, value } = schema.validate(req.body, { stripUnknown: true });
+  const { error, value } = genreSchema.validate(req.body, {
+    stripUnknown: true,
+  });
   if (error) {
     throw new HttpError(400, error.details[0].message);
   }
@@ -40,7 +38,9 @@ router.post("/", async (req, res) => {
 });
 
 router.put("/:id", validateObjectId, async (req, res) => {
-  const { error, value } = schema.validate(req.body, { stripUnknown: true });
+  const { error, value } = genreSchema.validate(req.body, {
+    stripUnknown: true,
+  });
   if (error) {
     throw new HttpError(400, error.details[0].message);
   }

@@ -1,20 +1,11 @@
 const express = require("express");
 const HttpError = require("../utils/http-error");
-const Joi = require("joi");
 const Rental = require("../models/rental");
 const Customer = require("../models/customer");
 const Movie = require("../models/movie");
+const { rentalSchema } = require("../utils/joi");
 
 const router = express.Router();
-
-const schema = Joi.object({
-  customer: Joi.string()
-    .regex(/^[0-9a-fA-F]{24}$/)
-    .required(),
-  movie: Joi.string()
-    .regex(/^[0-9a-fA-F]{24}$/)
-    .required(),
-});
 
 router.get("/", async (req, res) => {
   const rentals = await Rental.find().populate("customer movie");
@@ -23,7 +14,9 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { error, value } = schema.validate(req.body, { stripUnknown: true });
+  const { error, value } = rentalSchema.validate(req.body, {
+    stripUnknown: true,
+  });
   if (error) {
     throw new HttpError(400, error.details[0].message);
   }
