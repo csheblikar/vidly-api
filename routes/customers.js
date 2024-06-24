@@ -1,13 +1,14 @@
-const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
 const express = require("express");
 const HttpError = require("../utils/http-error");
 const Joi = require("joi");
 const Customer = require("../models/customer");
+const validateObjectId = require("../middleware/validateObjectId");
 
 const router = express.Router();
 
 const schema = Joi.object({
-  name: Joi.string().min(3).required(),
+  name: Joi.string().min(5).required(),
   isGold: Joi.boolean().required(),
   phone: Joi.string().min(10).required(),
 });
@@ -18,7 +19,7 @@ router.get("/", async (req, res) => {
   res.send({ data: customers });
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", validateObjectId, async (req, res) => {
   const customer = await Customer.findOne({ _id: req.params.id });
   if (!customer) {
     throw new HttpError(404, "Customer with the given ID not found");
@@ -43,7 +44,7 @@ router.post("/", async (req, res) => {
   res.send({ data: customer });
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", validateObjectId, async (req, res) => {
   const { error, value } = schema.validate(req.body, { stripUnknown: true });
   if (error) {
     throw new HttpError(400, error.details[0].message);
@@ -62,7 +63,7 @@ router.put("/:id", async (req, res) => {
   res.send({ data: customer });
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", validateObjectId, admin, async (req, res) => {
   const customer = await Customer.findOneAndDelete({ _id: req.params.id });
 
   if (!customer) {
