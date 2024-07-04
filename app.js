@@ -1,6 +1,8 @@
 const express = require("express");
 require("express-async-errors");
 const { expressjwt: expressJwt } = require("express-jwt");
+const helmet = require("helmet");
+const compression = require("compression");
 
 const app = express();
 
@@ -22,6 +24,9 @@ app.use(
     ],
   }),
 );
+
+app.use(helmet());
+app.use(compression());
 
 app.use("/api/genres", require("./routes/genres"));
 app.use("/api/customers", require("./routes/customers"));

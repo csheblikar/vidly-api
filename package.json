@@ -1,10 +1,12 @@
 {
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "compression": "^1.7.4",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
     "express-jwt": "^8.4.1",
+    "helmet": "^7.1.0",
     "joi": "^17.13.1",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.30.1",
@@ -26,5 +28,9 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "DOTENV_CONFIG_PATH=.env.test.local jest --watchAll --verbose --coverage --runInBand"
+  },
+
+  "engines": {
+    "node": "20.14.0"
   }
 }
