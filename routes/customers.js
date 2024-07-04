@@ -4,6 +4,7 @@ const HttpError = require("../utils/http-error");
 const Customer = require("../models/customer");
 const validateObjectId = require("../middleware/validateObjectId");
 const { customerSchema } = require("../utils/joi");
+const validate = require("../middleware/validate");
 
 const router = express.Router();
 
@@ -22,44 +23,35 @@ router.get("/:id", validateObjectId, async (req, res) => {
   res.send({ data: customer });
 });
 
-router.post("/", async (req, res) => {
-  const { error, value } = customerSchema.validate(req.body, {
-    stripUnknown: true,
-  });
-  if (error) {
-    throw new HttpError(400, error.details[0].message);
-  }
-
+router.post("/", validate(customerSchema), async (req, res) => {
   const customer = new Customer({
-    name: value.name,
-    isGold: value.isGold,
-    phone: value.phone,
+    name: req.body.name,
+    isGold: req.body.isGold,
+    phone: req.body.phone,
   });
 
   await customer.save();
   res.send({ data: customer });
 });
 
-router.put("/:id", validateObjectId, async (req, res) => {
-  const { error, value } = customerSchema.validate(req.body, {
-    stripUnknown: true,
-  });
-  if (error) {
-    throw new HttpError(400, error.details[0].message);
-  }
+router.put(
+  "/:id",
+  validate(customerSchema),
+  validateObjectId,
+  async (req, res) => {
+    const customer = await Customer.findOneAndUpdate(
+      { _id: req.params.id },
+      { ...req.body },
+      { new: true },
+    );
 
-  const customer = await Customer.findOneAndUpdate(
-    { _id: req.params.id },
-    { ...value },
-    { new: true },
-  );
+    if (!customer) {
+      throw new HttpError(404, "Customer with the given ID not found");
+    }
 
-  if (!customer) {
-    throw new HttpError(404, "Customer with the given ID not found");
-  }
-
-  res.send({ data: customer });
-});
+    res.send({ data: customer });
+  },
+);
 
 router.delete("/:id", validateObjectId, admin, async (req, res) => {
   const customer = await Customer.findOneAndDelete({ _id: req.params.id });
